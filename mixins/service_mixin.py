@@ -1,4 +1,4 @@
-from ..mixins.application_exception import ApplicationException
+from application_exception import ApplicationException
 from fastapi.responses import JSONResponse
 from fastapi import status
 from typing import Union
