@@ -34,9 +34,9 @@ def log_function(logger: logging.Logger):
             status_code = result.status_code if hasattr(result, "status_code") else None
 
             if type(result) == JSONResponse and hasattr(result, "body"):
-                result = normalize_data_to_log(body=json.loads(result.body))
+                normalized_data = normalize_data_to_log(body=json.loads(result.body))
 
-            logger.info(f"{self.__class__.__name__}.{func.__name__} code: {status_code}; returned: {result};")
+            logger.info(f"{self.__class__.__name__}.{func.__name__} code: {status_code}; returned: {normalized_data};")
             return result
         return _wrapper
     return _decorator
