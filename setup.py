@@ -13,7 +13,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'fastapi', 'idna', 'pydantic', 'pydantic_core', 'sniffio', 'SQLAlchemy',
-        'starlette', 'typing_extensions', 'annotated-types', 'anyio, aio_pika'
+        'starlette', 'typing_extensions', 'annotated-types', 'anyio', 'aio_pika'
     ],
     keywords=['python', 'video', 'stream', 'video stream', 'camera stream', 'sockets'],
     classifiers=[
