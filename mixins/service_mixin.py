@@ -26,10 +26,10 @@ class ServiceMixin:
     def error_response(self, code: int, message: str):
         raise ApplicationException(message=message, code=code)
 
-    async def check_and_execute_method(self, *args) -> Any:
+    async def check_and_execute_method(self, method: str, *args) -> Any:
         result = None
-        if hasattr(self, 'success_response'):
-            func = getattr(self, 'success_response')
+        if hasattr(self, method):
+            func = getattr(self, method)
             if not func:
                 raise ApplicationException(message="Такого метода не существует.", code=400)
             try:
