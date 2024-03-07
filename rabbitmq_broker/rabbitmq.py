@@ -20,6 +20,7 @@ async def send_message(url: str, service: str, service_to: str, method: str, bod
     }
     channel = await connect_and_get_channel(url)
     await channel.declare_queue(service, auto_delete=True)
+    await channel.declare_queue(service_to, auto_delete=True)
     await channel.default_exchange.publish(
         Message(body=str(message).encode()),
         routing_key=service_to
@@ -36,6 +37,7 @@ async def send_answer_message(url: str, service: str, service_to: str, body: str
     }
     channel = await connect_and_get_channel(url)
     await channel.declare_queue(service, auto_delete=True)
+    await channel.declare_queue(service_to, auto_delete=True)
     await channel.default_exchange.publish(
         Message(body=str(message).encode()),
         routing_key=service_to
@@ -52,6 +54,7 @@ async def send_error_message(url: str, service: str, service_to: str, error_mess
     }
     channel = await connect_and_get_channel(url)
     await channel.declare_queue(service, auto_delete=True)
+    await channel.declare_queue(service_to, auto_delete=True)
     await channel.default_exchange.publish(
         Message(body=str(message).encode()),
         routing_key=service_to
@@ -69,6 +72,5 @@ async def get_message(url: str, service: str) -> dict:
     channel = await connect_and_get_channel(url)
     queue = await channel.get_queue(service)
     message = await queue.get()
-    await queue.delete(if_empty=True)
 
     return eval(message.body.decode())
