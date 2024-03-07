@@ -67,7 +67,8 @@ async def listen_queue(url: str, service_name: str, method: Callable) -> None:
 
 async def get_message(url: str, service: str) -> dict:
     channel = await connect_and_get_channel(url)
-    queue = await channel.declare_queue(service, auto_delete=True)
-    async for message in queue:
-        async with message.process():
-            return eval(message.body.decode())
+    queue = await channel.get_queue(service)
+    message = await queue.get()
+    await queue.delete(if_empty=True)
+
+    return eval(message.body.decode())
