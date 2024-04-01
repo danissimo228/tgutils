@@ -1,4 +1,5 @@
 from fastapi.responses import JSONResponse
+from mixins.service_mixin import ServiceMixin
 from typing import Callable
 import functools
 import logging
@@ -23,14 +24,24 @@ def log_function(logger: logging.Logger):
     def _decorator(func: Callable):
         @functools.wraps(func)
         async def _wrapper(self, *args, **kwargs):
+            service_mixin = ServiceMixin()
             normalized_data = normalize_data_to_log(body=kwargs.get('body', {}))
             logger.info(
                 f"{self.__class__.__name__}.{func.__name__} args: {args}; kwargs: {normalized_data};"
             )
             if asyncio.iscoroutinefunction(func):
-                result = await func(self, *args, **kwargs)
+                try:
+                    result = await func(self, *args, **kwargs)
+                except Exception as ex:
+                    logger.error(f"{self.__class__.__name__}.{func.__name__} code: 400; returned:{ex}")
+                    return service_mixin.error_response(400, str(ex))
             else:
-                result = func(*args, **kwargs)
+                try:
+                    result = func(*args, **kwargs)
+                except Exception as ex:
+                    logger.error(f"{self.__class__.__name__}.{func.__name__} code: 400; returned:{ex}")
+                    return service_mixin.error_response(400, str(ex))
+
             status_code = result.status_code if hasattr(result, "status_code") else None
 
             if type(result) == JSONResponse and hasattr(result, "body"):
