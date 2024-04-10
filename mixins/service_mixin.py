@@ -26,18 +26,9 @@ class ServiceMixin:
     def error_response(self, code: int, message: str):
         raise ApplicationException(message=message, code=code)
 
-    async def check_and_execute_method(self, method: str, *args) -> Any:
-        result = None
-        if hasattr(self, method):
-            func = getattr(self, method)
-            if not func:
-                raise ApplicationException(message="Такого метода не существует.", code=400)
-            try:
-                if asyncio.iscoroutinefunction(func):
-                    result = await func(*args)
-                else:
-                    result = func(*args)
-            except TypeError:
-                raise ApplicationException("Нет таких параметров у метода.", code=400)
+    def model_to_dict(self, model: Any) -> dict:
+        model_dict = model.__dict__
+        del model_dict['_sa_instance_state']
+        return model_dict
 
-        return result
+
