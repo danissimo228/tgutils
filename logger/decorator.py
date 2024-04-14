@@ -1,3 +1,4 @@
+from mixins.application_exception import ApplicationException
 from fastapi.responses import JSONResponse
 from mixins.service_mixin import ServiceMixin
 from typing import Callable
@@ -32,12 +33,18 @@ def log_function(logger: logging.Logger):
             if asyncio.iscoroutinefunction(func):
                 try:
                     result = await func(self, *args, **kwargs)
+                except ApplicationException as ex:
+                    logger.error(f"{self.__class__.__name__}.{func.__name__} code: {ex.code}; returned:{ex.message}")
+                    return service_mixin.error_response(ex.code, ex.message)
                 except Exception as ex:
                     logger.error(f"{self.__class__.__name__}.{func.__name__} code: 400; returned:{ex}")
                     return service_mixin.error_response(400, str(ex))
             else:
                 try:
                     result = func(*args, **kwargs)
+                except ApplicationException as ex:
+                    logger.error(f"{self.__class__.__name__}.{func.__name__} code: {ex.code}; returned:{ex.message}")
+                    return service_mixin.error_response(ex.code, ex.message)
                 except Exception as ex:
                     logger.error(f"{self.__class__.__name__}.{func.__name__} code: 400; returned:{ex}")
                     return service_mixin.error_response(400, str(ex))
